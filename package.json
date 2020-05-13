@@ -1,0 +1,39 @@
+{
+  "name": "despertador3",
+  "productName": "Despertador3",
+  "version": "0.0.0",
+  "description": "",
+  "license": "MIT",
+  "repository": "user/repo",
+  "author": {
+    "name": "",
+    "email": "",
+    "url": ""
+  },
+  "scripts": {
+    "test": "xo",
+    "start": "electron .",
+    "build": "electron-packager . --out=dist --asar --overwrite --all"
+  },
+  "dependencies": {
+    "electron-titlebar-windows": "^3.0.0",
+    "jplayer": "^2.9.2",
+    "jquery": "^3.5.0",
+    "later": "^1.2.0",
+    "mediaelement": "^4.2.16",
+    "moment": "^2.25.0"
+  },
+  "devDependencies": {
+    "devtron": "^1.4.0",
+    "electron": "^8.2.3",
+    "electron-packager": "^14.2.1",
+    "electron-rebuild": "^1.10.1",
+    "xo": "^0.30.0"
+  },
+  "xo": {
+    "envs": [
+      "node",
+      "browser"
+    ]
+  }
+}

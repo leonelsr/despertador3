@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Despertador3</title>
+        <link rel="stylesheet" href="index.css">
+        <!-- <script src="node_modules/jquery/dist/jquery.min.js"></script> -->
+        <!-- <script src="node_modules/mediaelement/build/mediaelement-and-player.js"></script> -->
+        <!-- Add any other renderers you need; see Use Renderers for more information -->
+        <!-- <link rel="stylesheet" href="node_modules/mediaelement/build/mediaelementplayer.css" /> -->
+
+        <!-- 
+
+        <script src="https://cdn.jsdelivr.net/npm/openplayerjs@1.16.5/dist/openplayer.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openplayerjs@1.16.5/dist/openplayer.min.css">
+        
+        https://www.openplayerjs.com/
+
+         -->
+
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <style>
+            /*
+            html, body {
+                
+            }
+            */
+            audio {
+                filter: invert(1);
+            }
+            .right-btns {
+                float: right;
+                text-align: right;
+            }
+            #toggleBtn[data-state=true] span {
+                color: #091;
+            }
+            #toggleBtn[data-state=false] span {
+                color: #f55;
+            }
+            #toggleBtn span:after {
+                color: initial;
+            }
+            #toggleBtn[data-state=true] span:after {
+                content: ' on';
+            }
+            #toggleBtn[data-state=false] span:after {
+                content: ' off';
+            }
+            output {
+                color: #eee;
+            }
+        </style>
+
+    </head>
+    <body class="hover">
+        <audio id="alarmAudio" controls src="The Black Eyed Peas - Don't Lie (Instrumental Original)-d3SzodPJvTE.m4a" style="width: 100%; height: 60px;"></audio>
+        <button id="stopBtn" style="display: none;">Stop Alarm</button>
+        <button id="snoozeBtn" onclick="doSnooze()" style="display: none; width: 80vw; height: 50vh; margin: auto; font-size: 10vh;">Soneca</button>
+        
+        <div id="bottomBtns" style="position: absolute; bottom: 5px; min-width: 100%; left: 0; padding: 5px; box-sizing: border-box;">
+            <button id="reload" onclick="window.location.reload()">reload</button>
+            <button id="radioBtn" onclick="playRadio()">Rádio</button>
+
+            <div class="right-btns">
+
+                <button id="toggleBtn" onclick="toggleState()" data-state="true"><span>⬤</span></button>
+                <button id="closeApp" onclick="global.allowExit = true; require('electron').remote.app.exit();">X</button>
+            </div>
+            
+            <audio controls id="radioAudio" style="display: none; position: absolute; bottom: 2em; width: 50%; left: 50%; margin-left: -25%;"></audio>
+            <input id="radioVol" type="range" min="0" max="1" step="0.01" value="0.09"
+                style="position: absolute; bottom: 0.1em; width: 50%; left: 50%; margin-left: -25%;"
+                oninput="parseInt(volamt.value=this.value*100); radioAudio.volume=this.value;"
+                onmousewheel="console.log(arguments); this.value = (Number(this.value) + (arguments[0].wheelDelta > 0 ? 0.01 : -0.01)).toFixed(2); this.oninput()">
+            <output id="volamt" name="volamt" for="radioVol">0.09</output>
+
+        </div>
+        <script>
+            var mainWindow = require('electron').remote.getCurrentWindow();
+            const { ipcRenderer } = require('electron')
+            //const { DisableMinimize } = require('electron-disable-minimize');
+            const { exec, spawn } = require('child_process');
+            const moment = require('moment')
+            
+            /*
+            console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
+
+            ipcRenderer.on('asynchronous-reply', (event, arg) => {
+            console.log(arg) // prints "pong"
+            })
+            ipcRenderer.send('asynchronous-message', 'ping')
+            */
+
+            
+            var audioEl = document.querySelector('#alarmAudio')
+            var later = require('later');
+            later.date.localTime();
+
+            var sched = later.parse.recur()
+                //.on('02:19:50').time().and()
+                .on('07:15:00').time().and()
+                .on('08:05:00').time()
+            
+
+            var timer = later.setInterval(function () {
+                console.log('executed')
+                if (isSnoozed) {
+                    clearTimeout(isSnoozed.timer)
+                    isSnoozed = false
+                }
+                playFadeIn()
+            }, sched);
+            /*
+            if (new Date() > moment('07:05:00','HH:mm:ss')) {
+                doSnooze();
+            }
+            */
+
+            toggleBtn.onclick = function () { this.dataset.state = !JSON.parse(this.dataset.state) }
+
+            var isSnoozed = false;
+            //var radioVolume = 0.09;
+
+            function playFadeIn() {
+                if (!JSON.parse(document.getElementById('toggleBtn').dataset.state)) {
+                    return;
+                }
+                document.querySelector('#snoozeBtn').style.display = 'block'
+
+                exec('nircmd.exe mutesysvolume 0')
+                exec('nircmd.exe changesysvolume 65535')
+
+                /*
+                exec('nircmd.exe changesysvolume 65535', (err, stdout, stderr) => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    console.log(stdout);
+                });
+                */
+
+                var radioEl = document.getElementById('radioAudio')
+                if (!radioEl.paused) {
+                    radioVolume = radioEl.volume
+                    radioEl.volume = 0.01
+                }
+
+                audioEl.volume = 0.01
+                audioEl.play()
+                var fadeCount = 0
+                var fadeTimer = setInterval(function () {
+                    if (audioEl.volume == 1 || audioEl.paused || audioEl.ended) {
+                        clearInterval(fadeTimer)
+                        return
+                    }
+                    if (++fadeCount < 99) {
+                        audioEl.volume = (audioEl.volume + 0.01).toFixed(2);
+                    } else {
+                        audioEl.volume = 1
+                        clearInterval(fadeTimer)
+                    }
+                    console.log('volume', audioEl.volume)
+                },2000)
+            }
+
+            document.querySelector('#stopBtn').onclick = event => {
+                audioEl.pause();
+                audioEl.currentTime = 0;
+                document.querySelector('#snoozeBtn').style.display = 'none'
+            }
+            
+            audioEl.onpause = event => {
+                document.querySelector('#snoozeBtn').style.display = 'none'
+                document.querySelector('#stopBtn').style.display = 'none'
+                var radioEl = document.getElementById('radioAudio')
+                if (!radioEl.paused) {
+                    radioEl.volume = radioVolume;
+                }
+            }
+            audioEl.addEventListener("play", event => {
+                document.querySelector('#snoozeBtn').style.display = 'block'
+                document.querySelector('#stopBtn').style.display = 'block'
+
+            });
+            // audioEl.addEventListener("ended", event => {
+            //     document.querySelector('#snoozeBtn').style.display = 'none')
+            // };
+
+            function doSnooze() {
+                document.querySelector('#snoozeBtn').style.display = 'none'
+                audioEl.pause();
+                audioEl.currentTime = 0;
+                isSnoozed = {
+                    timer: setTimeout(function () {
+                        // audioEl.play();
+                        playFadeIn()
+                        isSnoozed = false;
+                } , 10*60*1000)}
+            }
+
+
+            function playRadio() {
+                var radioEl = document.getElementById('radioAudio');
+                radioEl.style.display = 'block'
+                radioEl.volume = 0.09
+
+                exec('nircmd.exe mutesysvolume 0')
+                exec('nircmd.exe setsysvolume 32768')
+
+
+                if (Hls.isSupported()) {
+                    var hls = new Hls();
+                    hls.loadSource('https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8');
+                    hls.attachMedia(radioEl);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                        radioEl.play();
+                    });
+                }
+                else if (radioEl.canPlayType('application/vnd.apple.mpegurl')) {
+                    radioEl.src = 'https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8';
+                    radioEl.addEventListener('loadedmetadata', function () {
+                        radioEl.play();
+                    });
+                }
+            }
+
+
+            /* 
+            
+            var sched = later.parse.recur()
+            //.on('02:22:30').time().and()
+            //.on('02:47:00').time().and()
+            .on('08:05:00').time()
+            
+            */
+
+            var radioSched = later.parse.recur()
+            .on('07:00:00').time().and()
+            .on('07:30:00').time().and()
+            .on('08:20:00').time()
+
+            var radioTimer = later.setInterval(function () {
+                console.log('executed radioTimer')
+                if (isSnoozed) {
+                    clearTimeout(isSnoozed.timer)
+                    isSnoozed = false
+                }
+                playRadio()
+            }, radioSched);
+
+            // document.querySelector('#radioVol').onmousewheel = function (event) {
+            //     console.log(event);
+            //     this.value = (Number(this.value) + (event.wheelDelta > 0 ? 0.01 : -0.01)).toFixed(2);
+            //     this.oninput()
+            // }
+
+
+
+
+
+            // get the native HWND handle
+/*
+             let handle = mainWindow.getNativeWindowHandle();
+
+            // Disable Minimize Perfectly!
+            setTimeout(() => {
+                console.log('DisableMinimize', DisableMinimize(handle)); // boolean
+            }, 10000);
+            
+            mainWindow.on('minimize', function(event) {
+                setTimeout(() => {
+                    mainWindow.restore();
+                    mainWindow.once('restore', function (restoreEvent) {
+                        mainWindow.blur();
+                    });
+                }, 5000);
+            });
+
+            var resizeTimeout;
+            mainWindow.on('resize', (e)=>{
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function(){
+                    var size = mainWindow.getSize();
+                    mainWindow.setSize(size[0], parseInt(size[0] * 0.3));
+                }, 100);
+            });
+ */
+        </script>
+    </body>
+</html>
