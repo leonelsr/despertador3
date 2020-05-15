@@ -1,7 +1,10 @@
 'use strict';
 const electron = require('electron');
 
-const app = electron.app;
+const { app } = require('electron')
+
+
+
 
 /*
 const remote = require('electron').remote;
@@ -13,7 +16,7 @@ remote.app.exit(0);
 //require('electron-debug')();
 
 // Prevent window being garbage collected
-let mainWindow;
+let mainWindow = null;
 
 function onClosed() {
 	// Dereference the window
@@ -86,11 +89,31 @@ app.on('window-all-closed', () => {
 	}
 });
 
-app.on('activate', () => {
-	if (!mainWindow) {
-		mainWindow = createMainWindow();
-	}
-});
+
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
+
+  // Create mainWindow, load the rest of the app, etc...
+  app.whenReady().then(() => {
+  //})
+  //app.on('activate', () => {
+	  if (!mainWindow) {
+		  mainWindow = createMainWindow();
+	  }
+  });
+}
+
+
 
 app.on('ready', () => {
 	mainWindow = createMainWindow();
