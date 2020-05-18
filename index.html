@@ -71,9 +71,9 @@
             <audio controls id="radioAudio" style="display: none; position: absolute; bottom: 2em; width: 50%; left: 50%; margin-left: -25%;"></audio>
             <input id="radioVol" type="range" min="0" max="1" step="0.01" value="0.09"
                 style="position: absolute; bottom: 0.1em; width: 50%; left: 50%; margin-left: -25%;"
-                oninput="parseInt(volamt.value=this.value*100); radioAudio.volume=this.value;"
+                oninput="volamt.value=parseInt(this.value*100); radioAudio.volume=this.value;"
                 onmousewheel="console.log(arguments); this.value = (Number(this.value) + (arguments[0].wheelDelta > 0 ? 0.01 : -0.01)).toFixed(2); this.oninput()">
-            <output id="volamt" name="volamt" for="radioVol">0.09</output>
+            <output id="volamt" name="volamt" for="radioVol">9</output>
 
         </div>
         <script>
