@@ -50,13 +50,21 @@
             output {
                 color: #eee;
             }
+            #soundfile {
+                filter: invert(1);
+            }
         </style>
 
     </head>
     <body class="hover">
+        <input id="soundfile" type="file" accept="audio/*,video/*" onchange="document.getElementById('alarmAudio').src = this.files[0].path">
         <audio id="alarmAudio" controls src="The Black Eyed Peas - Don't Lie (Instrumental Original)-d3SzodPJvTE.m4a" style="width: 100%; height: 60px;"></audio>
-        <button id="stopBtn" style="display: none;">Stop Alarm</button>
         <button id="snoozeBtn" onclick="doSnooze()" style="display: none; width: 80vw; height: 50vh; margin: auto; font-size: 10vh;">Soneca</button>
+        <button id="stopBtn" style="display: none;
+        width: 80vw;
+        height: 10vh;
+        margin: auto;
+        font-size: 100%;">Stop Alarm</button>
         
         <div id="bottomBtns" style="position: absolute; bottom: 5px; min-width: 100%; left: 0; padding: 5px; box-sizing: border-box;">
             <button id="reload" onclick="window.location.reload()">reload</button>
@@ -71,9 +79,9 @@
             <audio controls id="radioAudio" style="display: none; position: absolute; bottom: 2em; width: 50%; left: 50%; margin-left: -25%;"></audio>
             <input id="radioVol" type="range" min="0" max="1" step="0.01" value="0.09"
                 style="position: absolute; bottom: 0.1em; width: 50%; left: 50%; margin-left: -25%;"
-                oninput="parseInt(volamt.value=this.value*100); radioAudio.volume=this.value;"
+                oninput="volamt.value=parseInt(this.value*100); radioAudio.volume=this.value;"
                 onmousewheel="console.log(arguments); this.value = (Number(this.value) + (arguments[0].wheelDelta > 0 ? 0.01 : -0.01)).toFixed(2); this.oninput()">
-            <output id="volamt" name="volamt" for="radioVol">0.09</output>
+            <output id="volamt" name="volamt" for="radioVol">9</output>
 
         </div>
         <script>
@@ -103,7 +111,7 @@
             toggleBtn.onclick = function () { this.dataset.state = !JSON.parse(this.dataset.state) }
 
             var isSnoozed = false;
-            //var radioVolume = 0.09;
+            var radioVolume = 0.1;
 
             function playFadeIn() {
                 if (!JSON.parse(document.getElementById('toggleBtn').dataset.state)) {
@@ -127,7 +135,8 @@
                 var radioEl = document.getElementById('radioAudio')
                 if (!radioEl.paused) {
                     radioVolume = radioEl.volume
-                    radioEl.volume = 0.01
+                    //radioEl.volume = 0.01
+                    radioVol.value = 0.01; radioVol.oninput()
                 }
 
                 audioEl.volume = 0.01
@@ -150,16 +159,17 @@
 
             document.querySelector('#stopBtn').onclick = event => {
                 audioEl.pause();
-                audioEl.currentTime = 0;
                 document.querySelector('#snoozeBtn').style.display = 'none'
             }
             
             audioEl.onpause = event => {
                 document.querySelector('#snoozeBtn').style.display = 'none'
                 document.querySelector('#stopBtn').style.display = 'none'
+                audioEl.currentTime = 0
                 var radioEl = document.getElementById('radioAudio')
                 if (!radioEl.paused) {
-                    radioEl.volume = radioVolume;
+                    //radioEl.volume = radioVolume;
+                    radioVol.value = radioVolume; radioVol.oninput()
                 }
             }
             audioEl.addEventListener("play", event => {
@@ -167,30 +177,33 @@
                 document.querySelector('#stopBtn').style.display = 'block'
 
             });
-            // audioEl.addEventListener("ended", event => {
-            //     document.querySelector('#snoozeBtn').style.display = 'none')
-            // };
+            audioEl.addEventListener("ended", event => {
+                document.querySelector('#snoozeBtn').style.display = 'none'
+                doSnooze(5*60*1000)
+            });
 
-            function doSnooze() {
+            function doSnooze(param) {
                 document.querySelector('#snoozeBtn').style.display = 'none'
                 audioEl.pause();
                 audioEl.currentTime = 0;
+                let snoozeTime = typeof param == "undefined" ? 10*60*1000 : param;
                 isSnoozed = {
                     timer: setTimeout(function () {
                         // audioEl.play();
                         playFadeIn()
                         isSnoozed = false;
-                } , 10*60*1000)}
+                } , snoozeTime)}
             }
 
 
             function playRadio() {
                 var radioEl = document.getElementById('radioAudio');
                 radioEl.style.display = 'block'
-                radioEl.volume = 0.09
+                radioEl.volume = 0.1
 
                 exec('nircmd.exe mutesysvolume 0')
-                exec('nircmd.exe setsysvolume 32768')
+                exec('nircmd.exe setsysvolume 65535')
+                //exec('nircmd.exe setsysvolume 32768')
 
 
                 if (Hls.isSupported()) {
