@@ -94,23 +94,6 @@
 
             
             var audioEl = document.querySelector('#alarmAudio')
-            var later = require('later');
-            later.date.localTime();
-
-            var sched = later.parse.recur()
-                //.on('02:19:50').time().and()
-                .on('07:15:00').time().and()
-                .on('08:05:00').time()
-            
-
-            var timer = later.setInterval(function () {
-                console.log('executed')
-                if (isSnoozed) {
-                    clearTimeout(isSnoozed.timer)
-                    isSnoozed = false
-                }
-                playFadeIn()
-            }, sched);
             /*
             if (new Date() > moment('07:05:00','HH:mm:ss')) {
                 doSnooze();
@@ -211,7 +194,14 @@
 
 
                 if (Hls.isSupported()) {
-                    var hls = new Hls();
+                    var hls = new Hls({
+                        debug: true,
+                        xhrSetup: function (xhr, url) {
+                            xhr.withCredentials = true; // do send cookie
+                            xhr.setRequestHeader("Referer", "https://evpp.mm.uol.com.br/band/bandnewsfm_poa/");
+                        }
+                    });
+
                     hls.loadSource('https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8');
                     hls.attachMedia(radioEl);
                     hls.on(Hls.Events.MANIFEST_PARSED, function () {
@@ -235,6 +225,26 @@
             .on('08:05:00').time()
             
             */
+
+
+            var later = require('later');
+            later.date.localTime();
+
+            var alarmSched = later.parse.recur()
+                //.on('02:19:50').time().and()
+                .on('07:15:00').time().and()
+                .on('08:05:00').time()
+            
+
+            var timer = later.setInterval(function () {
+                console.log('executed')
+                if (isSnoozed) {
+                    clearTimeout(isSnoozed.timer)
+                    isSnoozed = false
+                }
+                playFadeIn()
+            }, alarmSched);
+
 
             var radioSched = later.parse.recur()
             .on('07:00:00').time().and()
