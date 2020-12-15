@@ -87,6 +87,12 @@
 
         </div>
         <script>
+            ///////////////////////////////////////////////////////////////////////////////////////
+            //
+            // TODO: Pelo amor de Deus, refatorar esse ninho de rato todo, de uma vez !!!
+            //
+            ///////////////////////////////////////////////////////////////////////////////////////
+
             var mainWindow = require('electron').remote.getCurrentWindow();
             const { ipcRenderer } = require('electron')
             //const { DisableMinimize } = require('electron-disable-minimize');
@@ -94,7 +100,7 @@
             const moment = require('moment')
             const {dialog} = require('electron').remote;
             const fs = require('fs')
-            
+
             const CONFIG = require('./config.json')
             
             /*
