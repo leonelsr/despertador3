@@ -50,15 +50,17 @@
             output {
                 color: #eee;
             }
-            #soundfile {
+            #setSoundFile {
                 filter: invert(1);
             }
         </style>
 
     </head>
     <body class="hover">
-        <input id="soundfile" type="file" accept="audio/*,video/*" onchange="document.getElementById('alarmAudio').src = this.files[0].path">
-        <audio id="alarmAudio" controls src="The Black Eyed Peas - Don't Lie (Instrumental Original)-d3SzodPJvTE.m4a" style="width: 100%; height: 60px;"></audio>
+        <!-- <input id="soundfile" type="file" accept="audio/*,video/*" onchange="document.getElementById('alarmAudio').src = this.files[0].path"> -->
+        <button id="setSoundFile" onclick="doSetSound()">Set sound file</button>
+
+        <audio id="alarmAudio" controls src="" style="width: 100%; height: 60px;"></audio>
         <button id="snoozeBtn" onclick="doSnooze()" style="display: none; width: 80vw; height: 50vh; margin: auto; font-size: 10vh;">Soneca</button>
         <button id="stopBtn" style="display: none;
         width: 80vw;
@@ -90,6 +92,10 @@
             //const { DisableMinimize } = require('electron-disable-minimize');
             const { exec, spawn } = require('child_process');
             const moment = require('moment')
+            const {dialog} = require('electron').remote;
+            const fs = require('fs')
+            
+            const CONFIG = require('./config.json')
             
             /*
             console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
@@ -107,6 +113,30 @@
                 doSnooze();
             }
             */
+
+
+            audioEl.src = CONFIG.alarmSoundFile;
+
+
+            function doSetSound() {
+                dialog.showOpenDialog({
+                    properties: ['openFile', 'dontAddToRecent']
+                }).then((result) => {
+                    // result.canceled, result.filePaths
+                    console.log('result', result);
+                    if (!result.canceled) {
+                        audioEl.src = result.filePaths[0];
+                        CONFIG.alarmSoundFile = result.filePaths[0];
+                        updateConfig();
+                        console.log('feito', audioEl);
+                    }
+                }).catch(err => console.error(err));
+            }
+
+            function updateConfig() {
+                fs.writeFileSync('./config.json', JSON.stringify(CONFIG, null, 2))
+            }
+
 
             toggleBtn.onclick = function () { this.dataset.state = !JSON.parse(this.dataset.state) }
 
