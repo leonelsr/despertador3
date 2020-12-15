@@ -58,6 +58,7 @@ function createMainWindow() {
 		//skipTaskbar: true,
 		darkTheme: true,
 		backgroundColor: '#222222',
+		icon: __dirname + '/icon.ico',
 		webPreferences: {
 			nodeIntegration: true
 		}
