@@ -25,6 +25,12 @@
                 
             }
             */
+            .container-after-titlebar {
+                padding: 10px;
+            }
+            .titlebar {
+                font-family: sans-serif;
+            }
             audio {
                 filter: invert(1);
             }
@@ -61,7 +67,7 @@
         <button id="setSoundFile" onclick="doSetSound()">Set sound file</button>
 
         <audio id="alarmAudio" controls src="" style="width: 100%; height: 60px;"></audio>
-        <button id="snoozeBtn" onclick="doSnooze()" style="display: none; width: 80vw; height: 50vh; margin: auto; font-size: 10vh;">Soneca</button>
+        <button id="snoozeBtn" onclick="doSnooze()" style="display: none; width: 80vw; height: 50vh; margin: auto; font-size: 20vh; font-weight: bold;">Soneca</button>
         <button id="stopBtn" style="display: none;
         width: 80vw;
         height: 10vh;
@@ -75,7 +81,7 @@
             <div class="right-btns">
 
                 <button id="toggleBtn" onclick="toggleState()" data-state="true"><span>⬤</span></button>
-                <button id="closeApp" onclick="global.allowExit = true; require('electron').remote.app.exit();">X</button>
+                <!-- <button id="closeApp" onclick="exitBtn()">X</button> -->
             </div>
             
             <audio controls id="radioAudio" style="display: none; position: absolute; bottom: 2em; width: 50%; left: 50%; margin-left: -25%;"></audio>
@@ -111,6 +117,16 @@
             })
             ipcRenderer.send('asynchronous-message', 'ping')
             */
+
+            //mainWindow.setAutoHideMenuBar(true)
+            /*
+              Pensar em usar: https://github.com/AlexTorresSk/custom-electron-titlebar
+            */
+            const customTitlebar = require('custom-electron-titlebar');
+
+            new customTitlebar.Titlebar({
+                backgroundColor: customTitlebar.Color.fromHex('#444')
+            });
 
             
             var audioEl = document.querySelector('#alarmAudio')
@@ -309,6 +325,45 @@
                 }
                 playRadio()
             }, radioSched);
+
+
+
+
+
+            function exitBtn() {
+                dialog.showMessageBox({
+                    title: 'Sair?',
+                    type: 'none',
+                    buttons: [
+                        "&SONECA - VOU DORMIR MAIS",
+                        "&DESLIGA ALARME - Já acordei",
+                        "SA&IR (FECHAR)"
+                    ],
+                    message: "Quer SAIR mesmo?",
+                    noLink: false,
+                    cancelId: -1
+                }).then((res) => {
+                    console.log(res.response)
+                    console.log(res.checkboxChecked) //true or false
+                    if(res.response == 2) {
+                        global.allowExit = true;
+                        require('electron').remote.app.exit();
+                    } else if (res.response == 0) {
+                        doSnooze();
+                    } else if (res.response == 1) {
+                        audioEl.pause();
+                        toggleBtn.dataset.state = false;
+                    }
+                })
+
+            }
+
+
+            mainWindow.on('close', function(e) {
+                e.preventDefault();
+                exitBtn();
+            });
+
 
             // document.querySelector('#radioVol').onmousewheel = function (event) {
             //     console.log(event);

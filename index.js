@@ -51,16 +51,20 @@ function createMainWindow() {
 	const win = new electron.BrowserWindow({
 		// width: 400,
 		// height: 120,
-		//frame: false,
+		frame: false,
 		// x: 190,
 		// y: 95,
         // transparent: true,
 		//skipTaskbar: true,
+		//autoHideMenuBar: true,
+		titleBarStyle: 'hidden',
 		darkTheme: true,
 		backgroundColor: '#222222',
 		icon: __dirname + '/icon.ico',
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+			contextIsolation: false,
+			enableRemoteModule: true
 		}
 	});
 
@@ -77,7 +81,7 @@ function createMainWindow() {
 		if (global.allowExit === false) {
 		  e.preventDefault();
 		}
-	  });
+	});
 	  
 	win.on('closed', onClosed);
 
