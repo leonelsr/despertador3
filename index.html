@@ -92,6 +92,57 @@
             <output id="volamt" name="volamt" for="radioVol">9</output>
 
         </div>
+
+        <!-- 
+            procurar youtube nodejs API
+        -->
+
+        <!-- <script src="https://apis.google.com/js/api.js"></script>
+        <script>
+        /**
+         * Sample JavaScript code for youtube.search.list
+         * See instructions for running APIs Explorer code samples locally:
+         * https://developers.google.com/explorer-help/guides/code_samples#javascript
+         */
+
+        function authenticate() {
+            return gapi.auth2.getAuthInstance()
+                .signIn({scope: "https://www.googleapis.com/auth/youtube.force-ssl"})
+                .then(function() { console.log("Sign-in successful"); },
+                    function(err) { console.error("Error signing in", err); });
+        }
+        function loadClient() {
+            gapi.client.setApiKey("***REMOVED***"); // ***REMOVED***
+            return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+                .then(function() { console.log("GAPI client loaded for API"); },
+                    function(err) { console.error("Error loading GAPI client for API", err); });
+        }
+        // Make sure the client is loaded and sign-in is complete before calling this method.
+        function execute() {
+            return gapi.client.youtube.search.list({
+            "part": [
+                "snippet"
+            ],
+            "channelId": "UCWijW6tW0iI5ghsAbWDFtTg",
+            "eventType": "live",
+            "maxResults": 25,
+            "type": [
+                "video"
+            ]
+            })
+                .then(function(response) {
+                        // Handle the results here (response.result has the parsed body).
+                        console.log("Response", response);
+                    },
+                    function(err) { console.error("Execute error", err); });
+        }
+        gapi.load("client:auth2", function() {
+            gapi.auth2.init({client_id: "YOUR_CLIENT_ID"});
+        });
+        </script>
+        <button onclick="authenticate().then(loadClient)">authorize and load</button>
+        <button onclick="execute()">execute</button> -->
+
         <script>
             ///////////////////////////////////////////////////////////////////////////////////////
             //
@@ -106,8 +157,13 @@
             const moment = require('moment')
             const {dialog} = require('electron').remote;
             const fs = require('fs')
+            const ipc = require('electron').ipcRenderer;
 
             const CONFIG = require('./config.json')
+
+
+            var { google } = require('googleapis');
+            var youtube = google.youtube({ version: 'v3', auth: CONFIG.YouTubeAPIkey })
             
             /*
             console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
@@ -246,6 +302,74 @@
                         isSnoozed = false;
                 } , snoozeTime)}
             }
+
+
+
+            async function getYoutubeVideo() {
+                var searchParams = {
+                    "part": [
+                        "snippet"
+                    ],
+                    "channelId": "UCWijW6tW0iI5ghsAbWDFtTg", // BandNews
+                    //"channelId": "UCoa-D_VfMkFrCYodrOC9-mA", // Band Jornalismo
+                    //"channelId": "UCLgti7NuK0RuW9wty-fxPjQ", // TV Senado
+                    "eventType": "live",
+                    "maxResults": 25,
+                    "type": [
+                        "video"
+                    ]
+                }
+                var result = await youtube.search.list(searchParams);
+                console.log('results', result);
+                
+
+                if (result.data.items.length == 0) {
+                    console.log('Band Jornalismo');
+                    searchParams.channelId = 'UCoa-D_VfMkFrCYodrOC9-mA';
+                    result = await youtube.search.list(searchParams);
+                }
+                if (result.data.items.length == 0) {
+                    console.log('TV Senado');
+                    searchParams.channelId = 'UCLgti7NuK0RuW9wty-fxPjQ';
+                    result = await youtube.search.list(searchParams);
+                }
+                if (result.data.items.length == 0) {
+                    delete searchParams.channelId;
+                    console.log('params', searchParams);
+                    result = await youtube.search.list(searchParams);
+                    console.log('result', result);
+                }
+
+
+                return result.data.items[0].id.videoId
+            }
+
+            //videoId = await getYoutubeVideo();
+            //window.open('https://www.youtube.com/embed/'+videoid+'?autoplay=true', '_blank', 'frame=true,nodeIntegration=false');
+            var BrowserWindow = require('electron').remote.BrowserWindow;
+            /*
+            let ytwin = new BrowserWindow({
+                title: 'YouTube',
+                webPreferences: {
+                    nodeIntegration: true,
+                    contextIsolation: false,
+                    enableRemoteModule: true
+                }
+            });
+            ytwin.loadURL(`file://${__dirname}/ytindex.html`);
+
+            ytwin.webContents.on('did-finish-load', async () => {
+                var videoId = await getYoutubeVideo();
+                ytwin.webContents.send('loadvideo', videoId);
+                // ytwin.webContents.send('loadvideo', 'M7lc1UVf-VE');
+            });
+            */
+
+            /*
+            ipc.on('message', (event, message) => {
+                console.log(message); // logs out "Hello second window!"
+            })
+            */
 
 
             function playRadio() {

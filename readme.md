@@ -27,3 +27,8 @@ Builds the app for macOS, Linux, and Windows, using [electron-packager](https://
 ## License
 
 MIT © [<%= name %>](<%= website %>)
+
+
+
+https://xainey.github.io/2017/powershell-electron-demo/#installing-tools
+

@@ -19,6 +19,8 @@
     "custom-electron-titlebar": "^3.2.5",
     "electron-prompt": "^1.6.1",
     "electron-titlebar-windows": "^3.0.0",
+    "google-auth-library": "^7.0.4",
+    "googleapis": "^72.0.0",
     "jplayer": "^2.9.2",
     "jquery": "^3.5.1",
     "later": "^1.2.0",
