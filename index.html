@@ -344,7 +344,49 @@
                 return result.data.items[0].id.videoId
             }
 
+            //async function lgtvRequest(endpoint, payload)
+
             //videoId = await getYoutubeVideo();
+            
+            
+            async function playYTonTV() { return new Promise(async function (resolveYT, rejectYT) {
+                exec('WakeMeOnLan.exe /wakeup 58:FD:B1:AF:DA:3E');
+                
+                
+                // LG clientKey: ***REMOVED***
+                var lgtv = require("lgtv2")({
+                    url: 'ws://192.168.0.13:3000',
+                    //clientKey: '***REMOVED***',
+                    keyFile: './keyfile.txt'
+                });
+                videoId = await getYoutubeVideo();
+                
+                lgtv.on('connect', async function (connecterr, connectres) {
+                    if (connecterr) {
+                        console.log('connectecd error', connecterr);
+                    }
+                    console.log('connected', connectres);
+        
+                    lgtv.request('ssap://system.launcher/launch', {id: 'youtube.leanback.v4', contentId: "https://www.youtube.com/tv?v=" + videoId} , (err, result) => {
+                        RES = result;
+                        console.log(result);
+                        setTimeout(() => lgtv.getSocket('ssap://com.webos.service.networkinput/getPointerInputSocket',
+                            function (err, sock) {
+                                if (!err) {
+                                    sock.send('button', {name: 'ENTER'}); // ok = ENTER
+                                    resolveYT('OK');
+                                }
+                                else {
+                                    rejectYT(err);
+                                }
+                            }
+                        ), 15000);
+                    }) // lgtv.request(... (err,result)
+                }); // lgtv.on('connect',
+            })} // new Promise((resolveYT, rejectYT) => {
+
+
+
             //window.open('https://www.youtube.com/embed/'+videoid+'?autoplay=true', '_blank', 'frame=true,nodeIntegration=false');
             var BrowserWindow = require('electron').remote.BrowserWindow;
             /*
@@ -380,6 +422,8 @@
                 exec('nircmd.exe mutesysvolume 0')
                 exec('nircmd.exe setsysvolume 65535')
                 //exec('nircmd.exe setsysvolume 32768')
+
+                playYTonTV()
 
 
                 if (Hls.isSupported()) {

@@ -24,8 +24,10 @@
     "jplayer": "^2.9.2",
     "jquery": "^3.5.1",
     "later": "^1.2.0",
+    "lgtv2": "^1.6.3",
     "mediaelement": "^4.2.16",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "node-wol": "^0.1.1"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
