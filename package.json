@@ -16,6 +16,7 @@
     "build": "electron-packager . --out=dist --asar --overwrite --all"
   },
   "dependencies": {
+    "await-spawn": "^4.0.2",
     "custom-electron-titlebar": "^3.2.5",
     "electron-prompt": "^1.6.1",
     "electron-titlebar-windows": "^3.0.0",
@@ -25,13 +26,15 @@
     "jquery": "^3.5.1",
     "later": "^1.2.0",
     "lgtv2": "^1.6.3",
+    "loudness": "^0.4.1",
     "mediaelement": "^4.2.16",
     "moment": "^2.29.1",
-    "node-wol": "^0.1.1"
+    "node-wol": "^0.1.1",
+    "ytdl-core": "^4.9.1"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "^12.0.0",
+    "electron": "^12.0.9",
     "electron-packager": "^15.2.0",
     "electron-rebuild": "^2.3.5",
     "xo": "^0.38.2"
