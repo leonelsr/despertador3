@@ -255,6 +255,12 @@
                 });
                 */
 
+
+                mainWindow.focus()
+
+                document.querySelector('#snoozeBtn').style.display = 'block'
+                document.querySelector('#stopBtn').style.display = 'block'
+
                 var radioEl = document.getElementById('radioAudio')
                 if (!radioEl.paused) {
                     radioVolume = radioEl.volume
@@ -331,6 +337,7 @@
                     "channelId": "UCWijW6tW0iI5ghsAbWDFtTg", // BandNews
                     //"channelId": "UCoa-D_VfMkFrCYodrOC9-mA", // Band Jornalismo
                     //"channelId": "UCLgti7NuK0RuW9wty-fxPjQ", // TV Senado
+                    //"channelId": "UCN64HjXppbMaFrRLRfMHaoA", // Mix
                     "eventType": "live",
                     "maxResults": 25,
                     "type": [
@@ -501,6 +508,7 @@
 
             var alarmSched = later.parse.recur()
                 //.on('02:19:50').time().and()
+                //.on('02:24:45').time().and()
                 .on('07:15:00').time().and()
                 .on('08:35:00').time().and()
                 .on('09:05:00').time()
@@ -517,7 +525,7 @@
 
 
             var radioSched = later.parse.recur()
-                .on('07:00:00').time().and()
+                .on('07:00:20').time().and()
                 .on('07:30:00').time().and()
                 .on('08:20:00').time()
             
