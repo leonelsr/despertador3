@@ -221,7 +221,18 @@
             var isSnoozed = false;
             var radioVolume = 0.1;
 
-            function playFadeIn() {
+            async function pwshSay (frase, rate = 0, repeat = 1) {
+                const spawn = require('await-spawn');
+                await spawn("pwsh.exe", ['-Command', `$voice = (New-Object -ComObject SAPI.SpVoice);
+                    $voice.rate = ${rate};
+                    for ($i = 1; $i -le ${repeat}; $i++) {
+                        $voice.Speak('${frase}')
+                    }`]);
+            }
+            
+            var frase = 'Acorda!!! Tem Cristiano às 2 da tarde!!!';
+
+            async function playFadeIn() {
                 if (!JSON.parse(document.getElementById('toggleBtn').dataset.state)) {
                     return;
                 }
@@ -229,6 +240,10 @@
 
                 exec('nircmd.exe mutesysvolume 0')
                 exec('nircmd.exe changesysvolume 65535')
+
+                //const spawn = require('await-spawn');
+                //await spawn("pwsh.exe", ['-Command', "(New-Object -ComObject SAPI.SpVoice).Speak('Tem E-E-G na PUC às 11:30!!!')"]);
+                //await pwshSay(frase, 3, 1)
 
                 /*
                 exec('nircmd.exe changesysvolume 65535', (err, stdout, stderr) => {
@@ -256,6 +271,9 @@
                         return
                     }
                     if (++fadeCount < 99) {
+                        if (fadeCount%10==0) {
+                            // pwshSay(frase, 3, 2);
+                        }
                         audioEl.volume = (audioEl.volume + 0.01).toFixed(2);
                     } else {
                         audioEl.volume = 1
@@ -347,7 +365,25 @@
             //async function lgtvRequest(endpoint, payload)
 
             //videoId = await getYoutubeVideo();
-            
+
+            var loudness = require('loudness')
+
+            function fadeSystemVolume() {
+                var fadeCount = 0
+                var fadeTimer = setInterval(function () {
+                    if (++fadeCount < 99) {
+                        if (fadeCount%10==0) {
+                            //pwshSay(frase, 3, 2);
+                        }
+                        //audioEl.volume = (audioEl.volume + 0.01).toFixed(2);
+                        loudness.setVolume(fadeCount);
+                    } else {
+                        loudness.setVolume(100);
+                        clearInterval(fadeTimer)
+                    }
+                    console.log('volume', fadeCount)
+                },1000);
+            }
             
             async function playYTonTV() { return new Promise(async function (resolveYT, rejectYT) {
                 exec('WakeMeOnLan.exe /wakeup 58:FD:B1:AF:DA:3E');
@@ -498,7 +534,11 @@
 
 
 
-            function exitBtn() {
+            // npm i -S node-powershell
+
+            async function exitBtn() {
+                //const spawn = require('await-spawn');
+                //spawn("pwsh.exe", ['-Command', "(New-Object -ComObject SAPI.SpVoice).Speak('Tem médico às 8 e meia')"]);
                 dialog.showMessageBox({
                     title: 'Sair?',
                     type: 'none',
@@ -511,6 +551,7 @@
                     noLink: false,
                     cancelId: -1
                 }).then((res) => {
+                    //spawn("pwsh.exe", ['-Command', "(New-Object -ComObject SAPI.SpVoice).Speak('Tem médico às 8 e meia')"]);
                     console.log(res.response)
                     console.log(res.checkboxChecked) //true or false
                     if(res.response == 2) {
