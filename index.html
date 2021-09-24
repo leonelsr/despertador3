@@ -403,6 +403,16 @@
                     keyFile: './keyfile.txt'
                 });
                 videoId = await getYoutubeVideo();
+                videoURL = 'https://youtube.com/watch?v='+videoId
+
+                //exec('nircmd.exe mutesysvolume 0')
+                //exec('nircmd.exe setsysvolume 0')
+
+                //require("electron").shell.openExternal('https://youtube.com/watch?v='+videoId);
+                //ytBWin = window.open(videoURL, 'ytframe', 'frame=true,nodeIntegration=no,top=10,left=10,width=700,height=520');
+
+                // setTimeout(function() { playYTaudio(videoURL); },500);
+                playYTaudio(videoURL);
                 
                 lgtv.on('connect', async function (connecterr, connectres) {
                     if (connecterr) {
@@ -456,8 +466,38 @@
             })
             */
 
+            async function playYTaudio(videoURL) {
+                ytdl = require('ytdl-core');
+                videoInfo = await ytdl.getInfo(videoURL)
+
+                var radioEl = document.getElementById('radioAudio');
+                radioEl.style.display = 'block'
+                radioEl.volume = 0.1
+
+                var hls = new Hls({
+                    debug: true,
+                    xhrSetup: function (xhr, url) {
+                        //xhr.withCredentials = true; // do send cookie
+                        //xhr.setRequestHeader("Referer", videoURL);
+                    }
+                });
+
+                hls.loadSource(videoInfo.formats[0].url);
+                hls.attachMedia(radioEl);
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    radioEl.play();
+                });
+            }
 
             function playRadio() {
+                exec('nircmd.exe mutesysvolume 0')
+                exec('nircmd.exe setsysvolume 65535')
+                //exec('nircmd.exe setsysvolume 32768')
+
+                playYTonTV();
+            }
+
+            function playBandNewsHLS() {
                 var radioEl = document.getElementById('radioAudio');
                 radioEl.style.display = 'block'
                 radioEl.volume = 0.1
@@ -466,26 +506,26 @@
                 exec('nircmd.exe setsysvolume 65535')
                 //exec('nircmd.exe setsysvolume 32768')
 
-                playYTonTV()
-
-
                 if (Hls.isSupported()) {
                     var hls = new Hls({
                         debug: true,
                         xhrSetup: function (xhr, url) {
                             xhr.withCredentials = true; // do send cookie
-                            xhr.setRequestHeader("Referer", "https://evpp.mm.uol.com.br/band/bandnewsfm_poa/");
+                            // xhr.setRequestHeader("Referer", "https://evpp.mm.uol.com.br/band/bandnewsfm_poa/");
+                            xhr.setRequestHeader("Referer", "https://evpp.mm.uol.com.br/band/bandnewsfm_sp/");
                         }
                     });
 
-                    hls.loadSource('https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8');
+                    // hls.loadSource('https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8');
+                    hls.loadSource('https://evpp.mm.uol.com.br/band/bandnewsfm_sp/playlist.m3u8');
                     hls.attachMedia(radioEl);
                     hls.on(Hls.Events.MANIFEST_PARSED, function () {
                         radioEl.play();
                     });
                 }
                 else if (radioEl.canPlayType('application/vnd.apple.mpegurl')) {
-                    radioEl.src = 'https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8';
+                    // radioEl.src = 'https://evpp.mm.uol.com.br/band/bandnewsfm_poa/playlist.m3u8';
+                    radioEl.src = 'https://evpp.mm.uol.com.br/band/bandnewsfm_sp/playlist.m3u8';
                     radioEl.addEventListener('loadedmetadata', function () {
                         radioEl.play();
                     });
