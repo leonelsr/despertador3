@@ -221,17 +221,23 @@
             var isSnoozed = false;
             var radioVolume = 0.1;
 
-            async function pwshSay (frase, rate = 0, repeat = 1) {
-                const spawn = require('await-spawn');
-                await spawn("pwsh.exe", ['-Command', `$voice = (New-Object -ComObject SAPI.SpVoice);
-                    $voice.rate = ${rate};
-                    for ($i = 1; $i -le ${repeat}; $i++) {
-                        $voice.Speak('${frase}')
-                    }`]);
+            //window.enableSpeak = true;
+            //var frase = 'Levanta!!! Hoje tem Renata meio-dia e meia!!!';
+
+            async function pwshSay (CONFIG.frase, rate = 0, repeat = 1) {
+                if (CONFIG.enableSpeak)
+                {
+                    const spawn = require('await-spawn');
+                    await spawn("pwsh.exe", ['-Command', `$voice = (New-Object -ComObject SAPI.SpVoice);
+                        $voice.rate = ${rate};
+                        for ($i = 1; $i -le ${repeat}; $i++) {
+                            $voice.Speak('${CONFIG.frase}')
+                        }`]);
+                } else {
+                    return true;
+                }
             }
             
-            var frase = 'Acorda!!! Tem Cristiano às 2 da tarde!!!';
-
             async function playFadeIn() {
                 if (!JSON.parse(document.getElementById('toggleBtn').dataset.state)) {
                     return;
@@ -243,7 +249,7 @@
 
                 //const spawn = require('await-spawn');
                 //await spawn("pwsh.exe", ['-Command', "(New-Object -ComObject SAPI.SpVoice).Speak('Tem E-E-G na PUC às 11:30!!!')"]);
-                //await pwshSay(frase, 3, 1)
+                await pwshSay(CONFIG.frase, 2, 1)
 
                 /*
                 exec('nircmd.exe changesysvolume 65535', (err, stdout, stderr) => {
@@ -278,7 +284,7 @@
                     }
                     if (++fadeCount < 99) {
                         if (fadeCount%10==0) {
-                            // pwshSay(frase, 3, 2);
+                            pwshSay(CONFIG.frase, 2, 2);
                         }
                         audioEl.volume = (audioEl.volume + 0.01).toFixed(2);
                     } else {
@@ -380,7 +386,7 @@
                 var fadeTimer = setInterval(function () {
                     if (++fadeCount < 99) {
                         if (fadeCount%10==0) {
-                            //pwshSay(frase, 3, 2);
+                            pwshSay(CONFIG.frase, 2, 2);
                         }
                         //audioEl.volume = (audioEl.volume + 0.01).toFixed(2);
                         loudness.setVolume(fadeCount);
