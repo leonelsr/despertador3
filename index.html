@@ -225,14 +225,14 @@
             //window.enableSpeak = true;
             //var frase = 'Levanta!!! Hoje tem Renata meio-dia e meia!!!';
 
-            async function pwshSay (CONFIG.frase, rate = 0, repeat = 1) {
+            async function pwshSay (frase, rate = 0, repeat = 1) {
                 if (CONFIG.enableSpeak)
                 {
                     const spawn = require('await-spawn');
                     await spawn("pwsh.exe", ['-Command', `$voice = (New-Object -ComObject SAPI.SpVoice);
                         $voice.rate = ${rate};
                         for ($i = 1; $i -le ${repeat}; $i++) {
-                            $voice.Speak('${CONFIG.frase}')
+                            $voice.Speak('${frase}')
                         }`]);
                 } else {
                     return true;
