@@ -158,6 +158,7 @@
             const {dialog} = require('electron').remote;
             const fs = require('fs')
             const ipc = require('electron').ipcRenderer;
+            const prompt = require('electron-prompt');
 
             const CONFIG = require('./config.json')
 
@@ -298,6 +299,7 @@
             document.querySelector('#stopBtn').onclick = event => {
                 audioEl.pause();
                 document.querySelector('#snoozeBtn').style.display = 'none'
+                toggleBtn.dataset.state = false;
             }
             
             audioEl.onpause = event => {
@@ -571,7 +573,7 @@
 
 
             var radioSched = later.parse.recur()
-                .on('07:00:20').time().and()
+                .on('07:00:45').time().and()
                 .on('07:30:00').time().and()
                 .on('08:20:00').time()
             
@@ -585,7 +587,31 @@
             }, radioSched);
 
 
-
+            function sair() {
+                return prompt({
+                    title: 'Sair?',
+                    label: 'Para fechar, digite "Fechar"',
+                    value: '',
+                    //inputAttrs: {
+                    //    type: 'url'
+                    //},
+                    alwaysOnTop: true,
+                    type: 'input',
+                    resizable: true
+                })
+                .then((res) => {
+                    if(res === null) {
+                        console.log('user cancelled');
+                    } else if (res == "Fechar") {
+                        console.log('result', res);
+                        global.allowExit = true;
+                        require('electron').remote.app.exit();
+                    } else {
+                        console.log(res);
+                    }
+                })
+                .catch(console.error);
+            }
 
 
             // npm i -S node-powershell
@@ -609,8 +635,9 @@
                     console.log(res.response)
                     console.log(res.checkboxChecked) //true or false
                     if(res.response == 2) {
-                        global.allowExit = true;
-                        require('electron').remote.app.exit();
+                        sair();
+                        //global.allowExit = true;
+                        //require('electron').remote.app.exit();
                     } else if (res.response == 0) {
                         doSnooze();
                     } else if (res.response == 1) {
