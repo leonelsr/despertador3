@@ -199,6 +199,10 @@
             }
             */
 
+            function fadeAudioIn() {
+                
+            }
+
 
             audioEl.src = CONFIG.alarmSoundFile;
 
@@ -562,7 +566,7 @@
 
             var alarmSched = later.parse.recur()
                 //.on('02:19:50').time().and()
-                //.on('02:24:45').time().and()
+                //.on('06:00:00').time().and()
                 .on('07:15:00').time().and()
                 .on('08:35:00').time().and()
                 .on('09:05:00').time()
@@ -656,8 +660,9 @@
 
 
             mainWindow.on('close', function(e) {
-                e.preventDefault();
-                exitBtn();
+                //e.preventDefault();
+                //exitBtn();
+                console.log('mainWindow.on(close)');
             });
 
 
