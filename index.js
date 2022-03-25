@@ -3,7 +3,7 @@ const electron = require('electron');
 
 const { app } = require('electron')
 
-
+require('@electron/remote/main').initialize()
 
 
 /*

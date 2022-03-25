@@ -150,12 +150,18 @@
             //
             ///////////////////////////////////////////////////////////////////////////////////////
 
-            var mainWindow = require('electron').remote.getCurrentWindow();
+
+            // TODO: ver https://github.com/electron/remote
+            //       para melhorarar segurança e desempenho aqui
+            const { BrowserWindow } = require('@electron/remote')
+            var mainWindow = require('@electron/remote').getCurrentWindow();
+
+
             const { ipcRenderer } = require('electron')
             //const { DisableMinimize } = require('electron-disable-minimize');
             const { exec, spawn } = require('child_process');
             const moment = require('moment')
-            const {dialog} = require('electron').remote;
+            const {dialog} = require('@electron/remote');
             const fs = require('fs')
             const ipc = require('electron').ipcRenderer;
             const prompt = require('electron-prompt');
@@ -449,7 +455,7 @@
 
 
             //window.open('https://www.youtube.com/embed/'+videoid+'?autoplay=true', '_blank', 'frame=true,nodeIntegration=false');
-            var BrowserWindow = require('electron').remote.BrowserWindow;
+            //var BrowserWindow = require('electron').remote.BrowserWindow;
             /*
             let ytwin = new BrowserWindow({
                 title: 'YouTube',
@@ -605,7 +611,7 @@
                     } else if (res == "Fechar") {
                         console.log('result', res);
                         global.allowExit = true;
-                        require('electron').remote.app.exit();
+                        require('@electron/remote').app.exit();
                     } else {
                         console.log(res);
                     }
