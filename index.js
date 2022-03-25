@@ -1,10 +1,20 @@
 'use strict';
 const electron = require('electron');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+const fs = require("fs");
 
-const { app } = require('electron')
 
-require('@electron/remote/main').initialize()
+const { setupTitlebar, attachTitlebarToWindow } = require("custom-electron-titlebar/main")
 
+// setup the titlebar main process
+setupTitlebar();
+
+
+//require('@electron/remote/main').initialize()
+
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
 
 /*
 const remote = require('electron').remote;
@@ -23,8 +33,6 @@ function onClosed() {
 	// For multiple windows store them in an array
 	mainWindow = null;
 }
-
-const { ipcMain } = require('electron')
 
 /*
 ipcMain.on('asynchronous-message', (event, arg) => {
@@ -64,10 +72,15 @@ function createMainWindow() {
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
-			enableRemoteModule: true
+			enableRemoteModule: true,
+			preload: path.join(__dirname, 'preload.js')
 		}
 	});
 
+	attachTitlebarToWindow(win)
+	remoteMain.enable(win.webContents);
+
+	//win.loadFile('index.html');
 	win.loadURL(`file://${__dirname}/index.html`);
 	win.on('close', function(e) {
 		// const choice = require('electron').dialog.showMessageBoxSync(this,
@@ -82,7 +95,7 @@ function createMainWindow() {
 		  e.preventDefault();
 		}
 	});
-	  
+	
 	win.on('closed', onClosed);
 
 	return win;

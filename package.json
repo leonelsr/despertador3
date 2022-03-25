@@ -16,29 +16,30 @@
     "build": "electron-packager . --out=dist --asar --overwrite --all"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.1",
+    "@6c65726f79/custom-titlebar": "^0.9.1",
+    "@electron/remote": "^2.0.8",
     "await-spawn": "^4.0.2",
-    "custom-electron-titlebar": "^3.2.10",
+    "custom-electron-titlebar": "^4.1.0",
     "electron-prompt": "^1.7.0",
     "electron-titlebar-windows": "^3.0.0",
-    "google-auth-library": "^7.11.0",
-    "googleapis": "^72.0.0",
+    "google-auth-library": "^7.14.1",
+    "googleapis": "^98.0.0",
     "jplayer": "^2.9.2",
-    "jquery": "^3.5.1",
+    "jquery": "^3.6.0",
     "later": "^1.2.0",
     "lgtv2": "^1.6.3",
     "loudness": "^0.4.1",
-    "mediaelement": "^4.2.17",
+    "mediaelement": "^5.0.5",
     "moment": "^2.29.1",
     "node-wol": "^0.1.1",
-    "ytdl-core": "^4.9.2"
+    "ytdl-core": "^4.11.0"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "^12.2.3",
+    "electron": "^17.2.0",
     "electron-packager": "^15.4.0",
-    "electron-rebuild": "^2.3.5",
-    "xo": "^0.38.2"
+    "electron-rebuild": "^3.2.7",
+    "xo": "^0.48.0"
   },
   "xo": {
     "envs": [
