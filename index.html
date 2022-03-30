@@ -126,7 +126,7 @@
                     function(err) { console.error("Error signing in", err); });
         }
         function loadClient() {
-            gapi.client.setApiKey("***REMOVED***"); // ***REMOVED***
+            gapi.client.setApiKey("..."); // ...
             return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
                 .then(function() { console.log("GAPI client loaded for API"); },
                     function(err) { console.error("Error loading GAPI client for API", err); });
@@ -431,10 +431,10 @@
                 exec('WakeMeOnLan.exe /wakeup 58:FD:B1:AF:DA:3E');
                 
                 
-                // LG clientKey: ***REMOVED***
+                // LG clientKey: ...
                 var lgtv = require("lgtv2")({
                     url: 'ws://192.168.0.13:3000',
-                    //clientKey: '***REMOVED***',
+                    //clientKey: '...',
                     keyFile: './keyfile.txt'
                 });
                 videoId = await getYoutubeVideo();
