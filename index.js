@@ -11,6 +11,30 @@ const { setupTitlebar, attachTitlebarToWindow } = require("custom-electron-title
 setupTitlebar();
 
 
+
+/*
+https://stackoverflow.com/questions/43323565/how-to-structure-a-web-electron-app-code-will-be-in-both-places
+root/ 
+├── assets/ 
+├── css/
+├── js/ 
+├── node_modules/
+├── index.html
+├── main.js
+├── package.json
+├── (ect..)
+
+
+https://blog.logrocket.com/comparing-best-node-js-schedulers/
+https://github.com/breejs/bree                                  https://blog.logrocket.com/getting-started-with-bree-js/
+https://github.com/breejs/later
+
+# Usado no TV Scheduler:
+https://github.com/node-schedule/node-schedule
+
+*/
+
+
 //require('@electron/remote/main').initialize()
 
 const remoteMain = require('@electron/remote/main');
