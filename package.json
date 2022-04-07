@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "description": "",
   "license": "MIT",
-  "repository": "user/repo",
+  "repository": "leonelsr/despertador3",
+  "main": "main.js",
   "author": {
     "name": "Leonelsr",
     "email": "leonelsr@leonel.eu",
