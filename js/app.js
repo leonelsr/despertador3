@@ -95,11 +95,12 @@ var radioVolume = 0.1;
 async function pwshSay(frase, rate = 0, repeat = 1) {
     if (CONFIG.enableSpeak) {
         const spawn = require('await-spawn');
-        await spawn("pwsh.exe", ['-Command', `$voice = (New-Object -ComObject SAPI.SpVoice);
-                        $voice.rate = ${rate};
-                        for ($i = 1; $i -le ${repeat}; $i++) {
-                            $voice.Speak('${frase}')
-                        }`]);
+        await spawn("pwsh.exe", ['-Command', `
+            $voice = (New-Object -ComObject SAPI.SpVoice);
+            $voice.rate = ${rate};
+            for ($i = 1; $i -le ${repeat}; $i++) {
+                $voice.Speak('${frase}')
+            }`]);
     } else {
         return true;
     }
@@ -447,6 +448,10 @@ var radioSched = later.parse.recur()
     .on('08:20:00').time()
 
 var radioTimer = later.setInterval(function () {
+    let now = new Date();
+    if (now.getDay() == 6) {
+        return // sem rádio
+    }
     console.log('executed radioTimer')
     if (isSnoozed) {
         clearTimeout(isSnoozed.timer)
@@ -519,8 +524,9 @@ async function exitBtn() {
 
 
 mainWindow.on('close', function (e) {
-    //e.preventDefault();
-    //exitBtn();
+    e.preventDefault();
+    pwshSay('Aperta soneca e fecha só depois que levantar!')
+    exitBtn();
     console.log('mainWindow.on(close)');
 });
 
