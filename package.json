@@ -25,6 +25,7 @@
     "electron-titlebar-windows": "^3.0.0",
     "google-auth-library": "^7.14.1",
     "googleapis": "^98.0.0",
+    "hls.js": "^1.1.5",
     "jplayer": "^2.9.2",
     "jquery": "^3.6.0",
     "later": "^1.2.0",
