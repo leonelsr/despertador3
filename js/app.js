@@ -106,6 +106,22 @@ async function pwshSay(frase, rate = 0, repeat = 1) {
     }
 }
 
+
+
+async function sayFrase() {
+    await $(audioEl).animate({volume: 0.1}, {
+        duration: 5000,
+        progress: function() {},
+        //complete: function () {}
+    }).promise()
+    await pwshSay(CONFIG.frase, 2, 1)
+    await $(audioEl).animate({volume: 1}, {
+        duration: 5000,
+        progress: function() {},
+        //complete: function () {}
+    }).promise()
+}
+
 async function playFadeIn() {
     if (!JSON.parse(document.getElementById('toggleBtn').dataset.state)) {
         return;
@@ -144,6 +160,19 @@ async function playFadeIn() {
 
     audioEl.volume = 0.01
     audioEl.play()
+
+    
+    $(audioEl).animate({volume: 1}, {
+        duration: 10000,
+        progress: function() {},
+        complete: function () {
+            setTimeout(async function() {
+                await sayFrase()
+            }, 10000)
+        }
+    }).promise();
+    
+    /*
     var fadeCount = 0
     var fadeTimer = setInterval(function () {
         if (audioEl.volume == 1 || audioEl.paused || audioEl.ended) {
@@ -161,6 +190,7 @@ async function playFadeIn() {
         }
         console.log('volume', audioEl.volume)
     }, 2000)
+    */
 }
 
 document.querySelector('#stopBtn').onclick = event => {
@@ -193,6 +223,7 @@ function doSnooze(param) {
     document.querySelector('#snoozeBtn').style.display = 'none'
     audioEl.pause();
     audioEl.currentTime = 0;
+    pwshSay(CONFIG.frase, 2, 1);
     let snoozeTime = typeof param == "undefined" ? 10 * 60 * 1000 : param;
     isSnoozed = {
         timer: setTimeout(function () {
@@ -426,7 +457,7 @@ later.date.localTime();
 
 var alarmSched = later.parse.recur()
     //.on('02:19:50').time().and()
-    //.on('06:00:00').time().and()
+    .on('06:45:00').time().and()
     .on('07:15:00').time().and()
     .on('08:35:00').time().and()
     .on('09:05:00').time()
@@ -449,7 +480,7 @@ var radioSched = later.parse.recur()
 
 var radioTimer = later.setInterval(function () {
     let now = new Date();
-    if (now.getDay() == 6) {
+    if (now.getDay() == 6 || now.getDay() == 0) {
         return // sem rádio
     }
     console.log('executed radioTimer')
@@ -525,7 +556,7 @@ async function exitBtn() {
 
 mainWindow.on('close', function (e) {
     e.preventDefault();
-    pwshSay('Aperta soneca e fecha só depois que levantar!')
+    pwshSay('Só depois que levantar! Agora só aperta soneca', 2, 2)
     exitBtn();
     console.log('mainWindow.on(close)');
 });
