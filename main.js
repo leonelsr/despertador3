@@ -77,7 +77,7 @@ ipcMain.on('synchronous-message', (event, arg) => {
 })
 */
 
-global.allowExit = true;
+global.allowExit = false;
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({

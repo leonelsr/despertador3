@@ -13,7 +13,10 @@ currentWindow.webContents.once('dom-ready', () => {
         browserWindow: currentWindow, /* Only needed if you use MenuItem roles */
         onMinimize: () => currentWindow.minimize(),
         onMaximize: () => currentWindow.isMaximized() ? currentWindow.unmaximize() : currentWindow.maximize(),
-        onClose: () => currentWindow.close(),
+        onClose: () => {
+            //currentWindow.close();
+            alert('Usa o SONECA')
+        },
         isMaximized: () => currentWindow.isMaximized()
     });
 });
