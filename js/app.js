@@ -254,6 +254,10 @@ async function getYoutubeVideo() {
     var result = await youtube.search.list(searchParams);
     console.log('results', result);
 
+    // "sleep"
+    //await new Promise(r => setTimeout(r, 2000));
+    
+    // [AO VIVO] Jornal BandNews FM - 17/05/2022
 
     if (result.data.items.length == 0) {
         console.log('Band Jornalismo');
@@ -305,7 +309,7 @@ async function playYTonTV() {
 
 
         // LG clientKey: ...
-        var lgtv = require("lgtv2")({
+        lgtv = require("lgtv2")({
             url: 'ws://192.168.0.13:3000',
             //clientKey: '...',
             keyFile: './keyfile.txt'
@@ -384,7 +388,7 @@ async function playYTaudio(videoURL) {
     radioEl.volume = 0.1
 
     var hls = new Hls({
-        debug: true,
+        //debug: true,
         xhrSetup: function (xhr, url) {
             //xhr.withCredentials = true; // do send cookie
             //xhr.setRequestHeader("Referer", videoURL);
@@ -457,7 +461,7 @@ later.date.localTime();
 
 var alarmSched = later.parse.recur()
     //.on('02:19:50').time().and()
-    .on('06:45:00').time().and()
+    //.on('06:45:00').time().and()
     .on('07:15:00').time().and()
     .on('08:35:00').time().and()
     .on('09:05:00').time()
