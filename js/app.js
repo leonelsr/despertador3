@@ -5,6 +5,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
+// TODO: transformar config.json em config.js de algum jeito. Array de alarms comn os dias da semana, frase, enableSpeak etc individual
+
+
 // TODO: ver https://github.com/electron/remote
 //       para melhorarar segurança e desempenho aqui
 const { BrowserWindow } = require('@electron/remote')
@@ -234,7 +237,7 @@ function doSnooze(param) {
     }
 }
 
-
+var isVideoRight = false;
 
 async function getYoutubeVideo() {
     var searchParams = {
@@ -256,10 +259,15 @@ async function getYoutubeVideo() {
 
     // "sleep"
     //await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 10000));
     
     // [AO VIVO] Jornal BandNews FM - 17/05/2022
 
-    if (result.data.items.length == 0) {
+
+    if (result.data.items.length != 0) {
+        isVideoRight = true;
+    } else {
+        isVideoRight = false;
         console.log('Band Jornalismo');
         searchParams.channelId = 'UCoa-D_VfMkFrCYodrOC9-mA';
         result = await youtube.search.list(searchParams);
@@ -303,10 +311,41 @@ function fadeSystemVolume() {
     }, 1000);
 }
 
+const lgtvRequest = async function (endpoint, payload) {
+    return new Promise((resolveRequest, rejectRequest) => {
+        lgtv.request(endpoint, payload, function (err, res) {
+            if (err) {
+                rejectRequest(err)
+            } else {
+                resolveRequest(res)
+            }
+        });
+    });
+}
+
+const pressOk = async function () {
+    return new Promise(async function (resolveOK, rejectOK) {
+        lgtv.getSocket('ssap://com.webos.service.networkinput/getPointerInputSocket',
+        function (err, sock) {
+            if (!err) {
+                sock.send('button', { name: 'ENTER' }); // ok = ENTER
+                resolveOK('OK');
+            }
+            else {
+                rejectOK(err);
+            }
+    })});
+};
+
+triesCount = 0
+
 async function playYTonTV() {
     return new Promise(async function (resolveYT, rejectYT) {
         exec('WakeMeOnLan.exe /wakeup 58:FD:B1:AF:DA:3E');
 
+
+        // https://www.npmjs.com/package/peer-dial
+        // pode ser bem melhor
 
         // LG clientKey: ...
         lgtv = require("lgtv2")({
@@ -314,8 +353,14 @@ async function playYTonTV() {
             //clientKey: '...',
             keyFile: './keyfile.txt'
         });
+
         videoId = await getYoutubeVideo();
         videoURL = 'https://youtube.com/watch?v=' + videoId
+
+        if (!isVideoRight && CONFIG.tryAgainVideo && triesCount < 5) {
+            console.log('wrong video, playing it but will try again in 1min, triesCount =', ++triesCount);
+            setTimeout(() => playYTonTV(), 60000)
+        }
 
         //exec('nircmd.exe mutesysvolume 0')
         //exec('nircmd.exe setsysvolume 0')
@@ -325,6 +370,13 @@ async function playYTonTV() {
 
         // setTimeout(function() { playYTaudio(videoURL); },500);
         playYTaudio(videoURL);
+
+        console.log('Starting YouTube',await lgtvRequest('ssap://system.launcher/launch', {
+            id: 'youtube.leanback.v4', contentId: "https://www.youtube.com/tv?v=" + videoId
+        }));
+        setTimeout(async function () {
+            await pressOk()
+        },15000)
 
         lgtv.on('connect', async function (connecterr, connectres) {
             if (connecterr) {
@@ -459,12 +511,18 @@ var sched = later.parse.recur()
 var later = require('later');
 later.date.localTime();
 
-var alarmSched = later.parse.recur()
+// var alarmSched = later.parse.recur()
     //.on('02:19:50').time().and()
     //.on('06:45:00').time().and()
-    .on('07:15:00').time().and()
-    .on('08:35:00').time().and()
-    .on('09:05:00').time()
+    // .on('07:15:00').time().and()
+    // .on('08:35:00').time().and()
+    // .on('09:05:00').time()
+
+var alarmSched = later.parse.recur()
+
+for (item of CONFIG.alarmTimes) {
+    alarmSched.and().on(item).time()
+}
 
 
 var timer = later.setInterval(function () {
@@ -477,10 +535,17 @@ var timer = later.setInterval(function () {
 }, alarmSched);
 
 
+// var radioSched = later.parse.recur()
+//     .on('07:00:45').time().and()
+//     .on('07:30:00').time().and()
+//     .on('08:20:00').time()
+
 var radioSched = later.parse.recur()
-    .on('07:00:45').time().and()
-    .on('07:30:00').time().and()
-    .on('08:20:00').time()
+
+for (item of CONFIG.radioTimes) {
+    radioSched.and().on(item).time()
+}
+
 
 var radioTimer = later.setInterval(function () {
     let now = new Date();
@@ -560,7 +625,8 @@ async function exitBtn() {
 
 mainWindow.on('close', function (e) {
     e.preventDefault();
-    pwshSay('Só depois que levantar! Agora só aperta soneca', 2, 2)
+    pwshSay('Não fecha ainda! Levanta e fecha pelo celular!', 2, 2)
+    // pwshSay('Só depois que levantar! Agora só aperta soneca', 2, 2)
     exitBtn();
     console.log('mainWindow.on(close)');
 });
