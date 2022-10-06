@@ -357,6 +357,8 @@ async function playYTonTV() {
         videoId = await getYoutubeVideo();
         videoURL = 'https://youtube.com/watch?v=' + videoId
 
+        exec('ytcast.exe -d 192.168.0.13 ' + videoURL)
+
         if (!isVideoRight && CONFIG.tryAgainVideo && triesCount < 5) {
             console.log('wrong video, playing it but will try again in 1min, triesCount =', ++triesCount);
             setTimeout(() => playYTonTV(), 60000)
@@ -371,6 +373,7 @@ async function playYTonTV() {
         // setTimeout(function() { playYTaudio(videoURL); },500);
         playYTaudio(videoURL);
 
+        /*
         console.log('Starting YouTube',await lgtvRequest('ssap://system.launcher/launch', {
             id: 'youtube.leanback.v4', contentId: "https://www.youtube.com/tv?v=" + videoId
         }));
@@ -400,6 +403,7 @@ async function playYTonTV() {
                 ), 15000);
             }) // lgtv.request(... (err,result)
         }); // lgtv.on('connect',
+        */
     })
 } // new Promise((resolveYT, rejectYT) => {
 
